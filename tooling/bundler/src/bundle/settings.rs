@@ -249,6 +249,8 @@ pub struct WindowsSettings {
   pub digest_algorithm: Option<String>,
   /// The SHA1 hash of the signing certificate.
   pub certificate_thumbprint: Option<String>,
+  /// Requires elevated privileges to run.
+  pub elevate_privileges: bool,
   /// Server to use during timestamping.
   pub timestamp_url: Option<String>,
   /// Whether to use Time-Stamp Protocol (TSP, a.k.a. RFC 3161) for the timestamp server. Your code signing provider may
@@ -279,6 +281,7 @@ impl Default for WindowsSettings {
     Self {
       digest_algorithm: None,
       certificate_thumbprint: None,
+      elevate_privileges: false,
       timestamp_url: None,
       tsp: false,
       wix: None,

@@ -812,6 +812,7 @@ fn tauri_config_to_bundle_settings(
       tsp: config.windows.tsp,
       digest_algorithm: config.windows.digest_algorithm,
       certificate_thumbprint: config.windows.certificate_thumbprint,
+      elevate_privileges: config.windows.elevate_privileges,
       wix: config.windows.wix.map(|w| {
         let mut wix = wix_settings(w);
         wix.license = wix.license.map(|l| tauri_dir().join(l));

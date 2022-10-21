@@ -483,6 +483,9 @@ pub struct WindowsConfig {
   /// Specifies the SHA1 hash of the signing certificate.
   #[serde(alias = "certificate-thumbprint")]
   pub certificate_thumbprint: Option<String>,
+  /// Requires elevated privileges to run.
+  #[serde(default, alias = "elevate-privileges")]
+  pub elevate_privileges: bool,
   /// Server to use during timestamping.
   #[serde(alias = "timestamp-url")]
   pub timestamp_url: Option<String>,
@@ -517,6 +520,7 @@ impl Default for WindowsConfig {
     Self {
       digest_algorithm: None,
       certificate_thumbprint: None,
+      elevate_privileges: false,
       timestamp_url: None,
       tsp: false,
       webview_install_mode: Default::default(),
