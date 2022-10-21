@@ -146,6 +146,7 @@
             "allowDowngrades": true,
             "certificateThumbprint": null,
             "digestAlgorithm": null,
+            "elevatePrivileges": false,
             "timestampUrl": null,
             "tsp": false,
             "webviewFixedRuntimePath": null,
@@ -283,6 +284,7 @@
               "allowDowngrades": true,
               "certificateThumbprint": null,
               "digestAlgorithm": null,
+              "elevatePrivileges": false,
               "timestampUrl": null,
               "tsp": false,
               "webviewFixedRuntimePath": null,
@@ -1120,6 +1122,7 @@
             "allowDowngrades": true,
             "certificateThumbprint": null,
             "digestAlgorithm": null,
+            "elevatePrivileges": false,
             "timestampUrl": null,
             "tsp": false,
             "webviewFixedRuntimePath": null,
@@ -1334,6 +1337,11 @@
             "string",
             "null"
           ]
+        },
+        "elevatePrivileges": {
+          "description": "Requires elevated privileges to run.",
+          "default": false,
+          "type": "boolean"
         },
         "timestampUrl": {
           "description": "Server to use during timestamping.",
