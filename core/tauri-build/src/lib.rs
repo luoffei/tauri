@@ -336,10 +336,9 @@ pub fn try_build(attributes: Attributes) -> Result<()> {
     if window_icon_path.exists() {
       let mut res = WindowsResource::new();
 
-      res.set_manifest(
-        r#"
+      let manifest = format!(r#"
         <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-          <dependency>
+          {}<dependency>
               <dependentAssembly>
                   <assemblyIdentity
                       type="win32"
@@ -352,8 +351,19 @@ pub fn try_build(attributes: Attributes) -> Result<()> {
               </dependentAssembly>
           </dependency>
         </assembly>
-        "#,
-      );
+        "#, if config.tauri.bundle.windows.elevate_privileges {
+          r#"
+          <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+            <security>
+              <requestedPrivileges>
+                <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+              </requestedPrivileges>
+            </security>
+          </trustInfo>
+          "#
+        } else {""});
+
+      res.set_manifest(&manifest);
 
       if let Some(sdk_dir) = &attributes.windows_attributes.sdk_dir {
         if let Some(sdk_dir_str) = sdk_dir.to_str() {
