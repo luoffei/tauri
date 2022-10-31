@@ -334,6 +334,8 @@ fn run_candle(
     cmd.arg("-ext");
     cmd.arg(ext);
   }
+  cmd.arg("-ext");
+  cmd.arg("WixUtilExtension");
   cmd
     .args(&args)
     .current_dir(cwd)
