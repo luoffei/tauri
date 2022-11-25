@@ -378,7 +378,7 @@ impl<R: Runtime> UpdateBuilder<R> {
       if let Some(timeout) = self.timeout {
         request = request.timeout(timeout);
       }
-      let resp = ClientBuilder::new().build()?.send(request).await;
+      let resp = ClientBuilder::new().build(None)?.send(request).await;
 
       // If we got a success, we stop the loop
       // and we set our remote_release variable
@@ -537,7 +537,7 @@ impl<R: Runtime> Update<R> {
       HeaderValue::from_str("tauri/updater").unwrap(),
     );
 
-    let client = ClientBuilder::new().build()?;
+    let client = ClientBuilder::new().build(None)?;
     // Create our request
     let mut req = HttpRequestBuilder::new("GET", self.download_url.as_str())?.headers(headers);
     if let Some(timeout) = self.timeout {
