@@ -59,10 +59,22 @@ pub enum Cmd {
 impl Cmd {
   #[module_command_handler(http_request)]
   async fn create_client<R: Runtime>(
-    _context: InvokeContext<R>,
+    context: InvokeContext<R>,
     options: Option<ClientBuilder>,
   ) -> super::Result<ClientId> {
-    let client = options.unwrap_or_default().build()?;
+    let mut user_agent = None;
+
+    let label = context.window.label();
+    let windows = &context.config.tauri.windows;
+    if !windows.is_empty() {
+      for window in windows {
+        if window.label == label {
+          user_agent = window.user_agent.clone();
+          break;
+        }
+      }
+    }
+    let client = options.unwrap_or_default().build(user_agent)?;
     let mut store = clients().lock().unwrap();
     let id = rand::random::<ClientId>();
     store.insert(id, client);

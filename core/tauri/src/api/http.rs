@@ -20,6 +20,7 @@ pub use reqwest::header;
 pub use attohttpc::header;
 
 use header::{HeaderName, HeaderValue};
+use http::header::USER_AGENT;
 
 #[derive(Deserialize)]
 #[serde(untagged)]
@@ -74,13 +75,13 @@ impl ClientBuilder {
 
   /// Builds the Client.
   #[cfg(not(feature = "reqwest-client"))]
-  pub fn build(self) -> crate::api::Result<Client> {
-    Ok(Client(self))
+  pub fn build(self, user_agent: Option<String>) -> crate::api::Result<Client> {
+    Ok(Client(self, user_agent))
   }
 
   /// Builds the Client.
   #[cfg(feature = "reqwest-client")]
-  pub fn build(self) -> crate::api::Result<Client> {
+  pub fn build(self, user_agent: Option<String>) -> crate::api::Result<Client> {
     let mut client_builder = reqwest::Client::builder();
 
     if let Some(max_redirections) = self.max_redirections {
@@ -95,6 +96,13 @@ impl ClientBuilder {
       client_builder = client_builder.connect_timeout(connect_timeout);
     }
 
+    if let Some(user_agent) = user_agent {
+      client_builder = client_builder.user_agent(user_agent);
+    }
+
+    // ignore unknown ca
+    client_builder = client_builder.danger_accept_invalid_certs(true);
+
     let client = client_builder.build()?;
     Ok(Client(client))
   }
@@ -108,7 +116,7 @@ pub struct Client(reqwest::Client);
 /// The HTTP client.
 #[cfg(not(feature = "reqwest-client"))]
 #[derive(Debug, Clone)]
-pub struct Client(ClientBuilder);
+pub struct Client(ClientBuilder, Option<String>);
 
 #[cfg(not(feature = "reqwest-client"))]
 impl Client {
@@ -119,7 +127,7 @@ impl Client {
   /// ```rust,no_run
   /// use tauri::api::http::{ClientBuilder, HttpRequestBuilder, ResponseType};
   /// async fn run_request() {
-  ///   let client = ClientBuilder::new().build().unwrap();
+  ///   let client = ClientBuilder::new().build(None).unwrap();
   ///   let response = client.send(
   ///     HttpRequestBuilder::new("GET", "https://www.rust-lang.org")
   ///       .unwrap()
@@ -156,6 +164,12 @@ impl Client {
     if let Some(timeout) = request.timeout {
       request_builder = request_builder.timeout(timeout);
     }
+
+    if let Some(user_agent) = &self.1 {
+      request_builder = request_builder.header_append(USER_AGENT, user_agent);
+    }
+
+    request_builder = request_builder.danger_accept_invalid_certs(true);
 
     let response = if let Some(body) = request.body {
       match body {
@@ -458,7 +472,7 @@ impl<'de> Deserialize<'de> for HeaderMap {
 /// async fn run() {
 ///   let client = ClientBuilder::new()
 ///     .max_redirections(3)
-///     .build()
+///     .build(None)
 ///     .unwrap();
 ///   let request = HttpRequestBuilder::new("GET", "http://example.com").unwrap()
 ///     .response_type(ResponseType::Text);
