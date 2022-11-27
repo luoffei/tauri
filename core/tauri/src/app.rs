@@ -1008,6 +1008,10 @@ pub struct Builder<R: Runtime> {
   /// The updater configuration.
   #[cfg(updater)]
   updater_settings: UpdaterSettings,
+
+  /// The server certificate error handler.
+  #[cfg(target_os = "windows")]
+  server_certificate_error_handler: Option<Arc<dyn Fn(i32, String) -> i32 + Send + Sync>>,
 }
 
 impl<R: Runtime> Builder<R> {
@@ -1036,6 +1040,8 @@ impl<R: Runtime> Builder<R> {
       system_tray_event_listeners: Vec::new(),
       #[cfg(updater)]
       updater_settings: Default::default(),
+      #[cfg(target_os = "windows")]
+      server_certificate_error_handler: None,
     }
   }
 
@@ -1471,6 +1477,28 @@ impl<R: Runtime> Builder<R> {
     self
   }
 
+  /// Sets the webview tls server certificate error handler.
+  ///
+  /// ## Platform-specific
+  ///
+  /// This configuration only impacts windows.
+  /// [Documentation](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14)
+  ///
+  /// # Examples
+  ///
+  /// ```no_run
+  /// tauri::Builder::default()
+  ///   .server_certificate_error_handler(std::sync::Arc::new(|error_status, certificate| 0));
+  /// ```
+  #[cfg(target_os = "windows")]
+  pub fn server_certificate_error_handler(
+    mut self,
+    server_certificate_error_handler: Arc<dyn Fn(i32, String) -> i32 + Send + Sync>,
+  ) -> Self {
+    self.server_certificate_error_handler = Some(server_certificate_error_handler);
+    self
+  }
+
   /// Builds the application.
   #[allow(clippy::type_complexity)]
   pub fn build<A: Assets>(mut self, context: Context<A>) -> crate::Result<App<R>> {
@@ -1629,7 +1657,11 @@ impl<R: Runtime> Builder<R> {
       .map(|p| p.label.clone())
       .collect::<Vec<_>>();
 
-    for pending in self.pending_windows {
+    for mut pending in self.pending_windows {
+      if let Some(handler) = self.server_certificate_error_handler.clone() {
+        pending.server_certificate_error_handler = Some(handler);
+      }
+
       let pending =
         app
           .manager
