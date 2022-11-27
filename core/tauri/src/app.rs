@@ -1044,6 +1044,16 @@ pub struct Builder<R: Runtime> {
   /// The server certificate error handler.
   #[cfg(target_os = "windows")]
   server_certificate_error_handler: Option<Arc<dyn Fn(i32, String) -> i32 + Send + Sync>>,
+
+  /// TLS error handling strategy.
+  #[cfg(any(
+    target_os = "linux",
+    target_os = "dragonfly",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+  ))]
+  tls_errors_policy: tauri_runtime::webview::TLSErrorsPolicy,
 }
 
 impl<R: Runtime> Builder<R> {
@@ -1075,6 +1085,14 @@ impl<R: Runtime> Builder<R> {
       device_event_filter: Default::default(),
       #[cfg(target_os = "windows")]
       server_certificate_error_handler: None,
+      #[cfg(any(
+        target_os = "linux",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd"
+      ))]
+      tls_errors_policy: tauri_runtime::webview::TLSErrorsPolicy::Fail,
     }
   }
 
@@ -1568,6 +1586,30 @@ impl<R: Runtime> Builder<R> {
     self
   }
 
+  /// Set tls error handling policy.
+  ///
+  /// ## Platform-specific
+  ///
+  /// **Windows / Android**: Not supported.
+  ///
+  /// # Examples
+  ///
+  /// ```no_run
+  /// tauri::Builder::default()
+  ///   .tls_errors_policy(tauri_runtime::webview::TLSErrorsPolicy::Ignore);
+  /// ```
+  #[cfg(any(
+    target_os = "linux",
+    target_os = "dragonfly",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+  ))]
+  pub fn tls_errors_policy(mut self, policy: tauri_runtime::webview::TLSErrorsPolicy) -> Self {
+    self.tls_errors_policy = policy;
+    self
+  }
+
   /// Builds the application.
   #[allow(clippy::type_complexity)]
   pub fn build<A: Assets>(mut self, context: Context<A>) -> crate::Result<App<R>> {
@@ -1732,8 +1774,20 @@ impl<R: Runtime> Builder<R> {
       .collect::<Vec<_>>();
 
     for mut pending in self.pending_windows {
+      #[cfg(target_os = "windows")]
       if let Some(handler) = self.server_certificate_error_handler.clone() {
         pending.server_certificate_error_handler = Some(handler);
+      }
+
+      #[cfg(any(
+        target_os = "linux",
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "openbsd",
+        target_os = "netbsd"
+      ))]
+      {
+        pending.tls_errors_policy = self.tls_errors_policy;
       }
 
       let pending =

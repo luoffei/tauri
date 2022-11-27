@@ -2989,7 +2989,7 @@ fn create_webview<T: UserEvent>(
   context: Context<T>,
   pending: PendingWindow<T, Wry<T>>,
 ) -> Result<WindowWrapper> {
-  #[allow(unused_mut)]
+  #[allow(unused_mut, unused_variables)]
   let PendingWindow {
     webview_attributes,
     uri_scheme_protocols,
@@ -3000,6 +3000,7 @@ fn create_webview<T: UserEvent>(
     menu_ids,
     js_event_listeners,
     server_certificate_error_handler,
+    tls_errors_policy,
     ..
   } = pending;
   let webview_id_map = context.webview_id_map.clone();
@@ -3069,8 +3070,26 @@ fn create_webview<T: UserEvent>(
       handler,
     ));
   }
+
+  #[cfg(any(
+    target_os = "linux",
+    target_os = "dragonfly",
+    target_os = "freebsd",
+    target_os = "openbsd",
+    target_os = "netbsd"
+  ))]
+  {
+    let tls_errors_policy = match tls_errors_policy {
+      tauri_runtime::webview::TLSErrorsPolicy::Ignore => webkit2gtk::TLSErrorsPolicy::Ignore,
+      tauri_runtime::webview::TLSErrorsPolicy::Fail => webkit2gtk::TLSErrorsPolicy::Fail,
+    };
+    webview_builder = webview_builder.with_tls_errors_policy(tls_errors_policy);
+  }
+
+  #[cfg(target_os = "windows")]
   if let Some(server_certificate_error_handler) = server_certificate_error_handler {
-    webview_builder = webview_builder.with_server_certificate_error_handler(server_certificate_error_handler);
+    webview_builder =
+      webview_builder.with_server_certificate_error_handler(server_certificate_error_handler);
   }
   for (scheme, protocol) in uri_scheme_protocols {
     webview_builder = webview_builder.with_custom_protocol(scheme, move |wry_request| {

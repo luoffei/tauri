@@ -7,7 +7,7 @@
 use crate::{
   http::{Request as HttpRequest, Response as HttpResponse},
   menu::{Menu, MenuEntry, MenuHash, MenuId},
-  webview::{WebviewAttributes, WebviewIpcHandler, WebviewServerCertificateErrorHandler},
+  webview::{WebviewAttributes, WebviewIpcHandler, WebviewServerCertificateErrorHandler, TLSErrorsPolicy},
   Dispatch, Runtime, UserEvent, WindowBuilder,
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -235,6 +235,9 @@ pub struct PendingWindow<T: UserEvent, R: Runtime<T>> {
 
   /// How to handle server certificate error ont the webview.
   pub server_certificate_error_handler: Option<WebviewServerCertificateErrorHandler>,
+
+  /// TLS error handling strategy.
+  pub tls_errors_policy: TLSErrorsPolicy,
 }
 
 pub fn is_label_valid(label: &str) -> bool {
@@ -275,6 +278,7 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         menu_ids: Arc::new(Mutex::new(menu_ids)),
         js_event_listeners: Default::default(),
         server_certificate_error_handler: None,
+        tls_errors_policy: TLSErrorsPolicy::Fail,
       })
     }
   }
@@ -305,6 +309,7 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         menu_ids: Arc::new(Mutex::new(menu_ids)),
         js_event_listeners: Default::default(),
         server_certificate_error_handler: None,
+        tls_errors_policy: TLSErrorsPolicy::Fail,
       })
     }
   }
