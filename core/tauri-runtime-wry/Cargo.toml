@@ -13,12 +13,18 @@ exclude = [ "CHANGELOG.md", "/target" ]
 readme = "README.md"
 
 [dependencies]
-wry = { version = "0.23.4", default-features = false, features = [ "file-drop", "protocol" ] }
+# wry = { version = "0.23.4", default-features = false, features = [ "file-drop", "protocol" ] }
 tauri-runtime = { version = "0.13.0-alpha.0", path = "../tauri-runtime" }
 tauri-utils = { version = "2.0.0-alpha.0", path = "../tauri-utils" }
 uuid = { version = "1", features = [ "v4" ] }
 rand = "0.8"
 raw-window-handle = "0.5"
+
+[dependencies.wry]
+git = "https://github.com/luoffei/wry.git"
+branch = "0.23.4"
+default-features = false
+features = [ "file-drop", "protocol" ]
 
 [target."cfg(windows)".dependencies]
 webview2-com = "0.19.1"

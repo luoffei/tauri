@@ -7,7 +7,7 @@
 use crate::{
   http::{Request as HttpRequest, Response as HttpResponse},
   menu::{Menu, MenuEntry, MenuHash, MenuId},
-  webview::{WebviewAttributes, WebviewIpcHandler},
+  webview::{WebviewAttributes, WebviewIpcHandler, WebviewServerCertificateErrorHandler},
   Dispatch, Runtime, UserEvent, WindowBuilder,
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -232,6 +232,9 @@ pub struct PendingWindow<T: UserEvent, R: Runtime<T>> {
 
   /// A HashMap mapping JS event names with associated listener ids.
   pub js_event_listeners: Arc<Mutex<HashMap<JsEventListenerKey, HashSet<u64>>>>,
+
+  /// How to handle server certificate error ont the webview.
+  pub server_certificate_error_handler: Option<WebviewServerCertificateErrorHandler>,
 }
 
 pub fn is_label_valid(label: &str) -> bool {
@@ -271,6 +274,7 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         url: "tauri://localhost".to_string(),
         menu_ids: Arc::new(Mutex::new(menu_ids)),
         js_event_listeners: Default::default(),
+        server_certificate_error_handler: None,
       })
     }
   }
@@ -280,6 +284,8 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
     window_config: WindowConfig,
     webview_attributes: WebviewAttributes,
     label: impl Into<String>,
+    #[cfg(target_os = "windows")]
+    server_certificate_error_handler: Option<WebviewServerCertificateErrorHandler>,
   ) -> crate::Result<Self> {
     let window_builder =
       <<R::Dispatcher as Dispatch<T>>::WindowBuilder>::with_config(window_config);
@@ -300,6 +306,10 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         url: "tauri://localhost".to_string(),
         menu_ids: Arc::new(Mutex::new(menu_ids)),
         js_event_listeners: Default::default(),
+        #[cfg(target_os = "windows")]
+        server_certificate_error_handler,
+        #[cfg(not(target_os = "windows"))]
+        server_certificate_error_handler: None,
       })
     }
   }
