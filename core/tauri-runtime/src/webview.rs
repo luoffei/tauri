@@ -16,7 +16,7 @@ use tauri_utils::{
 #[cfg(windows)]
 use windows::Win32::Foundation::HWND;
 
-use std::{fmt, path::PathBuf};
+use std::{fmt, path::PathBuf, sync::Arc};
 
 /// The attributes used to create an webview.
 #[derive(Debug, Clone)]
@@ -254,3 +254,6 @@ pub trait WindowBuilder: WindowBuilderBase {
 
 /// IPC handler.
 pub type WebviewIpcHandler<T, R> = Box<dyn Fn(DetachedWindow<T, R>, String) + Send>;
+
+/// Server certificate error handler.
+pub type WebviewServerCertificateErrorHandler = Arc<dyn Fn(i32, String) -> i32 + Send + Sync>;

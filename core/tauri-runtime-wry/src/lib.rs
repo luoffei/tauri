@@ -2999,6 +2999,7 @@ fn create_webview<T: UserEvent>(
     url,
     menu_ids,
     js_event_listeners,
+    server_certificate_error_handler,
     ..
   } = pending;
   let webview_id_map = context.webview_id_map.clone();
@@ -3067,6 +3068,9 @@ fn create_webview<T: UserEvent>(
       js_event_listeners,
       handler,
     ));
+  }
+  if let Some(server_certificate_error_handler) = server_certificate_error_handler {
+    webview_builder = webview_builder.with_server_certificate_error_handler(server_certificate_error_handler);
   }
   for (scheme, protocol) in uri_scheme_protocols {
     webview_builder = webview_builder.with_custom_protocol(scheme, move |wry_request| {
