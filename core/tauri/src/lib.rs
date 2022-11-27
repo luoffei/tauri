@@ -209,6 +209,15 @@ use std::{collections::HashMap, fmt, sync::Arc};
 // Export types likely to be used by the application.
 pub use runtime::http;
 
+#[cfg(any(
+  target_os = "linux",
+  target_os = "dragonfly",
+  target_os = "freebsd",
+  target_os = "openbsd",
+  target_os = "netbsd"
+))]
+pub use runtime::webview::TLSErrorsPolicy;
+
 #[cfg(target_os = "macos")]
 #[cfg_attr(doc_cfg, doc(cfg(target_os = "macos")))]
 pub use runtime::{menu::NativeImage, ActivationPolicy};
