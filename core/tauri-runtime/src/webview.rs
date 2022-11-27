@@ -244,3 +244,10 @@ pub type WebviewIpcHandler<T, R> = Box<dyn Fn(DetachedWindow<T, R>, String) + Se
 
 /// Server certificate error handler.
 pub type WebviewServerCertificateErrorHandler = Arc<dyn Fn(i32, String) -> i32 + Send + Sync>;
+
+/// Enum values used to denote the TLS errors policy.
+#[derive(Clone, Copy)]
+pub enum TLSErrorsPolicy {
+  Ignore,
+  Fail,
+}
