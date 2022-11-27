@@ -7,7 +7,9 @@
 use crate::{
   http::{Request as HttpRequest, Response as HttpResponse},
   menu::{Menu, MenuEntry, MenuHash, MenuId},
-  webview::{WebviewAttributes, WebviewIpcHandler, WebviewServerCertificateErrorHandler},
+  webview::{
+    TLSErrorsPolicy, WebviewAttributes, WebviewIpcHandler, WebviewServerCertificateErrorHandler,
+  },
   Dispatch, Runtime, UserEvent, WindowBuilder,
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -235,6 +237,9 @@ pub struct PendingWindow<T: UserEvent, R: Runtime<T>> {
 
   /// How to handle server certificate error ont the webview.
   pub server_certificate_error_handler: Option<WebviewServerCertificateErrorHandler>,
+
+  /// TLS error handling strategy.
+  pub tls_errors_policy: TLSErrorsPolicy,
 }
 
 pub fn is_label_valid(label: &str) -> bool {
@@ -275,6 +280,7 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         menu_ids: Arc::new(Mutex::new(menu_ids)),
         js_event_listeners: Default::default(),
         server_certificate_error_handler: None,
+        tls_errors_policy: TLSErrorsPolicy::Fail,
       })
     }
   }
@@ -284,8 +290,17 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
     window_config: WindowConfig,
     webview_attributes: WebviewAttributes,
     label: impl Into<String>,
-    #[cfg(target_os = "windows")]
-    server_certificate_error_handler: Option<WebviewServerCertificateErrorHandler>,
+    #[cfg(target_os = "windows")] server_certificate_error_handler: Option<
+      WebviewServerCertificateErrorHandler,
+    >,
+    #[cfg(any(
+      target_os = "linux",
+      target_os = "dragonfly",
+      target_os = "freebsd",
+      target_os = "openbsd",
+      target_os = "netbsd"
+    ))]
+    tls_errors_policy: crate::webview::TLSErrorsPolicy,
   ) -> crate::Result<Self> {
     let window_builder =
       <<R::Dispatcher as Dispatch<T>>::WindowBuilder>::with_config(window_config);
@@ -310,6 +325,22 @@ impl<T: UserEvent, R: Runtime<T>> PendingWindow<T, R> {
         server_certificate_error_handler,
         #[cfg(not(target_os = "windows"))]
         server_certificate_error_handler: None,
+        #[cfg(any(
+          target_os = "linux",
+          target_os = "dragonfly",
+          target_os = "freebsd",
+          target_os = "openbsd",
+          target_os = "netbsd"
+        ))]
+        tls_errors_policy,
+        #[cfg(not(any(
+          target_os = "linux",
+          target_os = "dragonfly",
+          target_os = "freebsd",
+          target_os = "openbsd",
+          target_os = "netbsd"
+        )))]
+        tls_errors_policy: TLSErrorsPolicy::Fail,
       })
     }
   }
