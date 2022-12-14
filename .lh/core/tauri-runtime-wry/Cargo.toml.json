@@ -1,0 +1,22 @@
+{
+    "sourceFile": "core/tauri-runtime-wry/Cargo.toml",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1670992976956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1670993006629,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,9 +12,8 @@\n exclude = [ \"CHANGELOG.md\", \"/target\" ]\n readme = \"README.md\"\n \n [dependencies]\n-<<<<<<< HEAD\n wry = { version = \"0.23\", default-features = false, features = [ \"file-drop\", \"protocol\" ] }\n tauri-runtime = { version = \"0.12.1\", path = \"../tauri-runtime\" }\n tauri-utils = { version = \"1.2.1\", path = \"../tauri-utils\" }\n uuid = { version = \"1\", features = [ \"v4\" ] }\n@@ -22,9 +21,9 @@\n raw-window-handle = \"0.5\"\n \n [dependencies.wry]\n git = \"https://github.com/luoffei/wry.git\"\n-branch = \"wry-v0.22.5\"\n+branch = \"wry-v0.23.3\"\n default-features = false\n features = [ \"file-drop\", \"protocol\" ]\n \n [target.\"cfg(windows)\".dependencies]\n"
+                }
+            ],
+            "date": 1670992976956,
+            "name": "Commit-0",
+            "content": "[package]\nname = \"tauri-runtime-wry\"\nversion = \"0.12.2\"\nauthors = [ \"Tauri Programme within The Commons Conservancy\" ]\ncategories = [ \"gui\", \"web-programming\" ]\nlicense = \"Apache-2.0 OR MIT\"\nhomepage = \"https://tauri.app\"\nrepository = \"https://github.com/tauri-apps/tauri\"\ndescription = \"Wry bindings to the Tauri runtime\"\nedition = \"2021\"\nrust-version = \"1.59\"\nexclude = [ \"CHANGELOG.md\", \"/target\" ]\nreadme = \"README.md\"\n\n[dependencies]\n<<<<<<< HEAD\nwry = { version = \"0.23\", default-features = false, features = [ \"file-drop\", \"protocol\" ] }\ntauri-runtime = { version = \"0.12.1\", path = \"../tauri-runtime\" }\ntauri-utils = { version = \"1.2.1\", path = \"../tauri-utils\" }\nuuid = { version = \"1\", features = [ \"v4\" ] }\nrand = \"0.8\"\nraw-window-handle = \"0.5\"\n\n[dependencies.wry]\ngit = \"https://github.com/luoffei/wry.git\"\nbranch = \"wry-v0.22.5\"\ndefault-features = false\nfeatures = [ \"file-drop\", \"protocol\" ]\n\n[target.\"cfg(windows)\".dependencies]\nwebview2-com = \"0.19.1\"\n\n  [target.\"cfg(windows)\".dependencies.windows]\n  version = \"0.39.0\"\n  features = [ \"Win32_Foundation\" ]\n\n[target.\"cfg(any(target_os = \\\"linux\\\", target_os = \\\"dragonfly\\\", target_os = \\\"freebsd\\\", target_os = \\\"openbsd\\\", target_os = \\\"netbsd\\\"))\".dependencies]\ngtk = { version = \"0.15\", features = [ \"v3_20\" ] }\nwebkit2gtk = { version = \"0.18.2\", features = [ \"v2_22\" ] }\npercent-encoding = \"2.1\"\n\n[target.\"cfg(any(target_os = \\\"ios\\\", target_os = \\\"macos\\\"))\".dependencies]\ncocoa = \"0.24\"\n\n[features]\ndox = [ \"wry/dox\" ]\ndevtools = [ \"wry/devtools\", \"tauri-runtime/devtools\" ]\nsystem-tray = [ \"tauri-runtime/system-tray\", \"wry/tray\" ]\nmacos-private-api = [\n  \"wry/fullscreen\",\n  \"wry/transparent\",\n  \"tauri-runtime/macos-private-api\"\n]\nobjc-exception = [ \"wry/objc-exception\" ]\nglobal-shortcut = [ \"tauri-runtime/global-shortcut\" ]\nclipboard = [ \"tauri-runtime/clipboard\" ]\nlinux-headers = [ \"wry/linux-headers\", \"webkit2gtk/v2_36\" ]\n"
+        }
+    ]
+}
