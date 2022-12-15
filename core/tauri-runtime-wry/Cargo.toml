@@ -21,7 +21,7 @@ rand = "0.8"
 raw-window-handle = "0.5"
 
 [dependencies.wry]
-git = "https://github.com/luoffei/wry.git"
+git = "https://git.jingantech.net/luofei/wry.git"
 branch = "wry-v0.23.3"
 default-features = false
 features = [ "file-drop", "protocol" ]
