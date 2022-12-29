@@ -42,7 +42,9 @@ use std::{
   collections::HashMap,
   path::{Path, PathBuf},
   sync::{mpsc::Sender, Arc, Weak},
+  env,
 };
+use log::{LevelFilter,error, info};
 
 use crate::runtime::menu::{Menu, MenuId, MenuIdRef};
 
@@ -1591,6 +1593,18 @@ impl<R: Runtime> Builder<R> {
       }
       if !config.file_drop_enabled {
         webview_attributes = webview_attributes.disable_file_drop_handler();
+      }
+
+      //reddream: set data directory
+      let key = "WEBVIEW2_USER_DATA_CUSTOMFOLDER";
+      match std::env::var(key) {
+          Ok(dir) => {
+            info!("webview2 dir:{:?}",&dir);
+            if &dir != "" {
+              webview_attributes = webview_attributes.data_directory(Path::new(&dir).to_path_buf());
+            }
+          },
+          Err(e) => println!("couldn't interpret {key}: {e}"),
       }
 
       self.pending_windows.push(PendingWindow::with_config(
