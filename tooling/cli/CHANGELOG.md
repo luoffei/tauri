@@ -1,5 +1,16 @@
 # Changelog
 
+## \[1.3.0]
+
+- Fix `tauri info` panicking when parsing crates version on a newly created project without a `Cargo.lock` file.
+  - [c2608423](https://www.github.com/tauri-apps/tauri/commit/c2608423b6eec5eb91d0ffc861714c011ad3988b) fix(cli): don't panic when a crate version couldn't be parsed ([#5873](https://www.github.com/tauri-apps/tauri/pull/5873)) on 2022-12-26
+- Add `--png` option for the `icon` command to generate custom icon sizes.
+  - [9d214412](https://www.github.com/tauri-apps/tauri/commit/9d2144128fc5fad67d8404bce95f82297ebb0e4a) feat(cli): add option to make custom icon sizes, closes [#5121](https://www.github.com/tauri-apps/tauri/pull/5121) ([#5246](https://www.github.com/tauri-apps/tauri/pull/5246)) on 2022-12-27
+- Fix building apps with unicode characters in their `productName`.
+  - [72621892](https://www.github.com/tauri-apps/tauri/commit/72621892fe8195bad67b4237467ebd7e89f6af7f) fix(cli): use `unicode` feature for `heck` crate, closes [#5860](https://www.github.com/tauri-apps/tauri/pull/5860) ([#5872](https://www.github.com/tauri-apps/tauri/pull/5872)) on 2022-12-26
+- Add support for Cargo's workspace inheritance for the package version.
+  - [cd8c074a](https://www.github.com/tauri-apps/tauri/commit/cd8c074ae6592303d3f6844a4fb6d262eae913b2) feat(cli): add support for Cargo's workspace inheritance for the package version, closes [#5070](https://www.github.com/tauri-apps/tauri/pull/5070) ([#5775](https://www.github.com/tauri-apps/tauri/pull/5775)) on 2022-12-14
+
 ## \[1.2.2]
 
 - Detect SvelteKit and Vite for the init and info commands.

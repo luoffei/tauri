@@ -1,5 +1,14 @@
 # Changelog
 
+## \[1.2.2]
+
+- Added the `additional_browser_args` option to the window configuration.
+  - Bumped due to a bump in tauri-utils.
+  - [3dc38b15](https://www.github.com/tauri-apps/tauri/commit/3dc38b150ea8c59c8ba67fd586f921016928f47c) feat(core): expose additional_browser_args to window config (fix: [#5757](https://www.github.com/tauri-apps/tauri/pull/5757)) ([#5799](https://www.github.com/tauri-apps/tauri/pull/5799)) on 2022-12-14
+- Added the `content_protected` option to the window configuration.
+  - Bumped due to a bump in tauri-utils.
+  - [4ab5545b](https://www.github.com/tauri-apps/tauri/commit/4ab5545b7a831c549f3c65e74de487ede3ab7ce5) feat: add content protection api, closes [#5132](https://www.github.com/tauri-apps/tauri/pull/5132) ([#5513](https://www.github.com/tauri-apps/tauri/pull/5513)) on 2022-12-13
+
 ## \[1.2.1]
 
 - Fix `allowlist > app > show/hide` always disabled when `allowlist > app > all: false`.
