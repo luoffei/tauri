@@ -3233,8 +3233,10 @@ mod build {
       } else {
         self.webview_install_mode.clone()
       };
+      let elevate_privileges = self.elevate_privileges;
       tokens.append_all(quote! { ::tauri::utils::config::WindowsConfig {
         webview_install_mode: #webview_install_mode,
+        elevate_privileges: #elevate_privileges,
         ..Default::default()
       }})
     }
