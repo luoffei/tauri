@@ -323,6 +323,10 @@ pub struct MacConfig {
   pub provider_short_name: Option<String>,
   /// Path to the entitlements file.
   pub entitlements: Option<String>,
+  /// Path to the dmg background image.
+  pub background: Option<PathBuf>,
+  /// Some other files that need to be included in the dmg.
+  pub attachments: Option<Vec<PathBuf>>,
 }
 
 impl Default for MacConfig {
@@ -335,6 +339,8 @@ impl Default for MacConfig {
       signing_identity: None,
       provider_short_name: None,
       entitlements: None,
+      background: None,
+      attachments: None,
     }
   }
 }

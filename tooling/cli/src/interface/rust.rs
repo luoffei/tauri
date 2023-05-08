@@ -1067,6 +1067,8 @@ fn tauri_config_to_bundle_settings(
       signing_identity,
       provider_short_name,
       entitlements: config.macos.entitlements,
+      background: config.macos.background,
+      attachments: config.macos.attachments,
       info_plist_path: {
         let path = tauri_dir().join("Info.plist");
         if path.exists() {

@@ -82,6 +82,9 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     .with_context(|| "Failed to copy external binaries")?;
 
   copy_binaries_to_bundle(&bundle_directory, settings)?;
+  // copy files
+  copy_background(settings)?;
+  copy_attachments(settings)?;
 
   if let Some(identity) = &settings.macos().signing_identity {
     // sign application
@@ -108,6 +111,46 @@ fn copy_binaries_to_bundle(bundle_directory: &Path, settings: &Settings) -> crat
     common::copy_file(&bin_path, &dest_dir.join(bin.name()))
       .with_context(|| format!("Failed to copy binary from {:?}", bin_path))?;
   }
+  Ok(())
+}
+
+/// Copy backgroud file to a path.
+pub fn copy_background(settings: &Settings) -> crate::Result<()> {
+  let output_path = settings.project_out_directory().join("bundle/macos");
+  if let Some(ref src) = settings.macos().background {
+    let dest = output_path.join(
+      src
+        .as_path()
+        .file_name()
+        .expect("failed to extract background filename")
+        .to_string_lossy()
+        .to_string(),
+    );
+    info!(action = "Running"; "copy `{:?}` to `{:?}`", src, dest);
+    common::copy_file(src, dest)?;
+  }
+
+  Ok(())
+}
+
+/// Copy backgroud file to a path.
+pub fn copy_attachments(settings: &Settings) -> crate::Result<()> {
+  let output_path = settings.project_out_directory().join("bundle/macos");
+  if let Some(ref attachments) = settings.macos().attachments {
+    for attachment in attachments {
+      let dest = output_path.join(
+        attachment
+          .as_path()
+          .file_name()
+          .expect("failed to extract attachment filename")
+          .to_string_lossy()
+          .to_string(),
+      );
+      info!(action = "Running"; "copy `{:?}` to `{:?}`", attachment, dest);
+      common::copy_file(attachment, dest)?;
+    }
+  }
+
   Ok(())
 }
 

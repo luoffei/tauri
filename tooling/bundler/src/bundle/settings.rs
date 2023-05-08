@@ -190,6 +190,10 @@ pub struct MacOsSettings {
   pub entitlements: Option<String>,
   /// Path to the Info.plist file for the bundle.
   pub info_plist_path: Option<PathBuf>,
+  /// Path to the dmg background image.
+  pub background: Option<PathBuf>,
+  /// Some other files that need to be included in the dmg.
+  pub attachments: Option<Vec<PathBuf>>,
 }
 
 /// Configuration for a target language for the WiX build.

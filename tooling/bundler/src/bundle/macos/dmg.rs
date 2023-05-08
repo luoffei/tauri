@@ -35,6 +35,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 
   // get the target path
   let output_path = settings.project_out_directory().join("bundle/dmg");
+
   let package_base_name = format!(
     "{}_{}_{}",
     settings.main_binary_name(),
@@ -93,45 +94,79 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
     .expect("Failed to chmod script");
 
   let mut args = vec![
-    "--volname",
-    product_name,
-    "--icon",
-    &bundle_file_name,
-    "180",
-    "170",
-    "--app-drop-link",
-    "480",
-    "170",
-    "--window-size",
-    "660",
-    "400",
-    "--hide-extension",
-    &bundle_file_name,
+    "--no-internet-enable".to_owned(),
+    "--volname".to_owned(),
+    product_name.to_owned(),
+    "--icon-size".to_owned(),
+    "100".to_owned(),
+    "--icon".to_owned(),
+    bundle_file_name.clone(),
+    "75".to_owned(),
+    "64".to_owned(),
+    "--app-drop-link".to_owned(),
+    "396".to_owned(),
+    "64".to_owned(),
+    "--window-size".to_owned(),
+    "571".to_owned(),
+    "375".to_owned(),
+    "--hide-extension".to_owned(),
+    bundle_file_name.clone(),
   ];
+
+  if let Some(attachments) = &settings.macos().attachments {
+
+    for (index, pair) in attachments.chunks(2).enumerate() {
+      let first_name = pair[0].file_name().unwrap().to_str().unwrap();
+
+      args.push("--add-file".to_owned());
+      args.push(first_name.to_owned());
+      args.push(first_name.to_owned());
+
+      args.push("75".to_owned());
+      let y = 64 + (index + 1) * (100 + 60);
+      let y = y.to_string();
+      args.push(y.clone());
+      if pair.len() == 2 {
+        let second_name = pair[1].file_name().unwrap().to_str().unwrap();
+
+        args.push("--add-file".to_owned());
+        args.push(second_name.to_owned());
+        args.push(second_name.to_owned());
+
+        args.push("396".to_owned());
+        args.push(y);
+      }
+    }
+  }
 
   let icns_icon_path =
     create_icns_file(&output_path, settings)?.map(|path| path.to_string_lossy().to_string());
   if let Some(icon) = &icns_icon_path {
-    args.push("--volicon");
-    args.push(icon);
+    args.push("--volicon".to_owned());
+    args.push(icon.to_owned());
+  }
+
+  if let Some(background) = &settings.macos().background {
+    args.push("--background".to_owned());
+    args.push(background.file_name().unwrap().to_str().unwrap().to_owned());
   }
 
   #[allow(unused_assignments)]
   let mut license_path_ref = "".to_string();
   if let Some(license_path) = &settings.macos().license {
-    args.push("--eula");
+    args.push("--eula".to_owned());
     license_path_ref = env::current_dir()?
       .join(license_path)
       .to_string_lossy()
       .to_string();
-    args.push(&license_path_ref);
+    args.push(license_path_ref);
   }
 
   // Issue #592 - Building MacOS dmg files on CI
   // https://github.com/tauri-apps/tauri/issues/592
   if let Some(value) = env::var_os("CI") {
     if value == "true" {
-      args.push("--skip-jenkins");
+      args.push("--skip-jenkins".to_owned());
     }
   }
 

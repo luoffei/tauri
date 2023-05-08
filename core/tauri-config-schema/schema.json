@@ -1330,6 +1330,23 @@
             "string",
             "null"
           ]
+        },
+        "background": {
+          "description": "Path to the dmg background image.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attachments": {
+          "description": "Some other files that need to be included in the dmg.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       },
       "additionalProperties": false
