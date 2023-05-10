@@ -6,7 +6,7 @@
 use super::common;
 
 #[cfg(target_os = "macos")]
-use super::macos::app;
+use super::macos::{app, dmg};
 
 #[cfg(target_os = "linux")]
 use super::linux::appimage;
@@ -64,8 +64,8 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 fn bundle_update_macos(settings: &Settings, bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
   use std::ffi::OsStr;
 
-  // find our .app or rebuild our bundle
-  let bundle_path = match bundles
+  // find our .app and .dmg or rebuild our bundle
+  let app_bundle_path = match bundles
     .iter()
     .filter(|bundle| bundle.package_type == crate::PackageType::MacOsBundle)
     .find_map(|bundle| {
@@ -78,12 +78,25 @@ fn bundle_update_macos(settings: &Settings, bundles: &[Bundle]) -> crate::Result
     None => app::bundle_project(settings)?,
   };
 
+  let dmg_bundle_path = match bundles
+    .iter()
+    .filter(|bundle| bundle.package_type == crate::PackageType::Dmg)
+    .find_map(|bundle| {
+      bundle
+        .bundle_paths
+        .iter()
+        .find(|path| path.extension() == Some(OsStr::new("dmg")))
+    }) {
+    Some(path) => vec![path.clone()],
+    None => dmg::bundle_project(settings, bundles)?,
+  };
+
   // we expect our .app to be on bundle_path[0]
-  if bundle_path.is_empty() {
+  if app_bundle_path.is_empty() {
     return Err(crate::Error::UnableToFindProject);
   }
 
-  let source_path = &bundle_path[0];
+  let source_path = &app_bundle_path[0];
 
   // add .tar.gz to our path
   let osx_archived = format!("{}.tar.gz", source_path.display());
@@ -96,7 +109,26 @@ fn bundle_update_macos(settings: &Settings, bundles: &[Bundle]) -> crate::Result
 
   info!(action = "Bundling"; "{} ({})", osx_archived, display_path(&osx_archived_path));
 
-  Ok(vec![osx_archived_path])
+  let mut updators = vec![osx_archived_path];
+
+  if !dmg_bundle_path.is_empty() {
+    let source_path = &dmg_bundle_path[0];
+
+    // add .tar.gz to our path
+    let osx_archived = format!("{}.tar.gz", source_path.display());
+    let osx_archived_path = PathBuf::from(&osx_archived);
+
+    // Create our gzip file (need to send parent)
+    // as we walk the source directory (source isnt added)
+    create_tar(source_path, &osx_archived_path)
+      .with_context(|| "Failed to tar.gz update directory")?;
+
+    info!(action = "Bundling"; "{} ({})", osx_archived, display_path(&osx_archived_path));
+
+    updators.push(osx_archived_path);
+  }
+
+  Ok(updators)
 }
 
 // Create simple update-linux_<arch>.tar.gz

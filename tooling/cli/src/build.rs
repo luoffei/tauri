@@ -314,6 +314,7 @@ pub fn command(mut options: Options, verbosity: u8) -> Result<()> {
       // make sure we have our package built
       let mut signed_paths = Vec::new();
       for elem in updater_bundles {
+        info!(action = "Running"; "sig for: {:?}", elem.bundle_paths);
         // we expect to have only one path in the vec but we iter if we add
         // another type of updater package who require multiple file signature
         for path in elem.bundle_paths.iter() {

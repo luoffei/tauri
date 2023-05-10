@@ -33,13 +33,13 @@ use std::{
   time::Duration,
 };
 
-#[cfg(any(target_os = "linux", windows))]
+#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
 use std::ffi::OsStr;
 
 #[cfg(all(desktop, not(target_os = "windows")))]
 use crate::api::file::Compression;
 
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "windows", target_os = "macos"))]
 use std::{
   fs::read_dir,
   process::{exit, Command},
@@ -860,51 +860,28 @@ fn copy_files_and_run<R: Read + Seek>(
 // │          └── ...
 // └── ...
 #[cfg(target_os = "macos")]
-fn copy_files_and_run<R: Read + Seek>(archive_buffer: R, extract_path: &Path) -> Result {
-  let mut extracted_files: Vec<PathBuf> = Vec::new();
+fn copy_files_and_run<R: Read + Seek>(archive_buffer: R, _extract_path: &Path) -> Result {
+  let tmp_dir = tempfile::Builder::new().tempdir()?.into_path();
 
-  // extract the buffer to the tmp_dir
-  // we extract our signed archive into our final directory without any temp file
   let mut extractor =
     Extract::from_cursor(archive_buffer, ArchiveFormat::Tar(Some(Compression::Gz)));
-  // the first file in the tar.gz will always be
-  // <app_name>/Contents
-  let tmp_dir = tempfile::Builder::new()
-    .prefix("tauri_current_app")
-    .tempdir()?;
 
-  // create backup of our current app
-  Move::from_source(extract_path).to_dest(tmp_dir.path())?;
+  // extract the dmg
+  extractor.extract_into(&tmp_dir)?;
 
-  // extract all the files
-  extractor.with_files(|entry| {
-    let path = entry.path()?;
-    // skip the first folder (should be the app name)
-    let collected_path: PathBuf = path.iter().skip(1).collect();
-    let extraction_path = extract_path.join(collected_path);
+  let paths = read_dir(&tmp_dir)?;
 
-    // if something went wrong during the extraction, we should restore previous app
-    if let Err(err) = entry.extract(&extraction_path) {
-      for file in &extracted_files {
-        // delete all the files we extracted
-        if file.is_dir() {
-          std::fs::remove_dir(file)?;
-        } else {
-          std::fs::remove_file(file)?;
-        }
-      }
-      Move::from_source(tmp_dir.path()).to_dest(extract_path)?;
-      return Err(crate::api::Error::Extract(err.to_string()));
+  for path in paths {
+    let found_path = path?.path();
+
+    if found_path.extension() == Some(OsStr::new("dmg")) {
+      // Open the dmg
+      let mut open = Command::new("open");
+      open.arg(found_path).spawn().expect("Unable to open");
+
+      exit(0);
     }
-
-    extracted_files.push(extraction_path);
-
-    Ok(false)
-  })?;
-
-  let _ = std::process::Command::new("touch")
-    .arg(extract_path)
-    .status();
+  }
 
   Ok(())
 }
