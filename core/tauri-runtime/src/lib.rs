@@ -292,6 +292,9 @@ impl<T: Debug + Clone + Send + 'static> UserEvent for T {}
 pub enum RunEvent<T: UserEvent> {
   /// Event loop is exiting.
   Exit,
+  /// Macos dock exit request.
+  #[cfg(target_os = "macos")]
+  DockExitRequest,
   /// Event loop is about to exit
   ExitRequested {
     tx: Sender<ExitRequestedEventAction>,

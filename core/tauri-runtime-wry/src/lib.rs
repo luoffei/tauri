@@ -2710,6 +2710,11 @@ fn handle_event_loop<T: UserEvent>(
       callback(RunEvent::Exit);
     }
 
+    #[cfg(target_os = "macos")]
+    Event::DockExitRequest => {
+      callback(RunEvent::DockExitRequest);
+    }
+
     #[cfg(all(desktop, feature = "global-shortcut"))]
     Event::GlobalShortcutEvent(accelerator_id) => {
       for (id, handler) in &*global_shortcut_manager_handle.listeners.lock().unwrap() {

@@ -158,6 +158,9 @@ impl From<RuntimeWindowEvent> for WindowEvent {
 pub enum RunEvent {
   /// Event loop is exiting.
   Exit,
+  /// MacOS dock exit request.
+  #[cfg(target_os = "macos")]
+  DockExitRequest,
   /// The app is about to exit
   #[non_exhaustive]
   ExitRequested {
@@ -1756,6 +1759,8 @@ fn on_event_loop_event<R: Runtime, F: FnMut(&AppHandle<R>, RunEvent) + 'static>(
 
   let event = match event {
     RuntimeRunEvent::Exit => RunEvent::Exit,
+    #[cfg(target_os = "macos")]
+    RuntimeRunEvent::DockExitRequest => RunEvent::DockExitRequest,
     RuntimeRunEvent::ExitRequested { tx } => RunEvent::ExitRequested {
       api: ExitRequestApi(tx),
     },
