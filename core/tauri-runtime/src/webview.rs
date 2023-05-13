@@ -29,6 +29,7 @@ pub struct WebviewAttributes {
   pub clipboard: bool,
   pub accept_first_mouse: bool,
   pub additional_browser_args: Option<String>,
+  pub ignore_tls_errors: bool,
 }
 
 impl WebviewAttributes {
@@ -43,6 +44,7 @@ impl WebviewAttributes {
       clipboard: false,
       accept_first_mouse: false,
       additional_browser_args: None,
+      ignore_tls_errors: false,
     }
   }
 
@@ -95,6 +97,13 @@ impl WebviewAttributes {
   #[must_use]
   pub fn additional_browser_args(mut self, additional_args: &str) -> Self {
     self.additional_browser_args = Some(additional_args.to_string());
+    self
+  }
+
+  /// Sets whether webview should ignore certificate errors.
+  #[must_use]
+  pub fn ignore_tls_errors(mut self, ignore_tls_errors: bool) -> Self {
+    self.ignore_tls_errors = ignore_tls_errors;
     self
   }
 }

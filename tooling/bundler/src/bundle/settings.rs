@@ -437,6 +437,7 @@ impl BundleBinary {
 
 /// The Settings exposed by the module.
 #[derive(Clone, Debug)]
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub struct Settings {
   /// The log level.
   log_level: log::Level,
@@ -454,6 +455,8 @@ pub struct Settings {
   binaries: Vec<BundleBinary>,
   /// The target triple.
   target: String,
+  /// Whether ignore webview tls errors.
+  ignore_tls_errors: bool,
 }
 
 /// A builder for [`Settings`].
@@ -466,6 +469,7 @@ pub struct SettingsBuilder {
   bundle_settings: BundleSettings,
   binaries: Vec<BundleBinary>,
   target: Option<String>,
+  ignore_tls_erros: bool,
 }
 
 impl SettingsBuilder {
@@ -525,6 +529,13 @@ impl SettingsBuilder {
     self
   }
 
+  /// Sets whether webview should ignore certificate errors.
+  #[must_use]
+  pub fn ignore_tls_errors(mut self, ignore_tls_errors: bool) -> Self {
+    self.ignore_tls_erros = ignore_tls_errors;
+    self
+  }
+
   /// Builds a Settings from the CLI args.
   ///
   /// Package settings will be read from Cargo.toml.
@@ -554,6 +565,7 @@ impl SettingsBuilder {
         ..self.bundle_settings
       },
       target,
+      ignore_tls_errors: self.ignore_tls_erros,
     })
   }
 }
@@ -817,5 +829,10 @@ impl Settings {
       Some(val) => val.active,
       None => false,
     }
+  }
+
+  /// Is ignore tls errors enabled
+  pub fn is_ignore_tls_errors(&self) -> bool {
+    self.ignore_tls_errors
   }
 }

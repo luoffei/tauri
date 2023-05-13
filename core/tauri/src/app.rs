@@ -1566,13 +1566,15 @@ impl<R: Runtime> Builder<R> {
       (self.invoke_responder, self.invoke_initialization_script),
     );
 
+    let ignore_tls_errors = manager.config().tauri.security.dangerous_ignore_tls_errors;
     // set up all the windows defined in the config
     for config in manager.config().tauri.windows.clone() {
       let url = config.url.clone();
       let label = config.label.clone();
 
-      let mut webview_attributes =
-        WebviewAttributes::new(url).accept_first_mouse(config.accept_first_mouse);
+      let mut webview_attributes = WebviewAttributes::new(url)
+        .accept_first_mouse(config.accept_first_mouse)
+        .ignore_tls_errors(ignore_tls_errors);
       if let Some(ua) = &config.user_agent {
         webview_attributes = webview_attributes.user_agent(ua);
       }

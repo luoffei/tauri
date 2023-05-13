@@ -3101,7 +3101,8 @@ fn create_webview<T: UserEvent>(
     .with_url(current_url.lock().unwrap().as_str())
     .unwrap() // safe to unwrap because we validate the URL beforehand
     .with_transparent(is_window_transparent)
-    .with_accept_first_mouse(webview_attributes.accept_first_mouse);
+    .with_accept_first_mouse(webview_attributes.accept_first_mouse)
+    .with_ignore_tls_errors(webview_attributes.ignore_tls_errors);
   if webview_attributes.file_drop_handler_enabled {
     webview_builder = webview_builder
       .with_file_drop_handler(create_file_drop_handler(window_event_listeners.clone()));

@@ -212,8 +212,8 @@ fn create_info_plist(
     plist.insert("NSHumanReadableCopyright".into(), copyright.into());
   }
 
+  let mut security = plist::Dictionary::new();
   if let Some(exception_domain) = settings.macos().exception_domain.clone() {
-    let mut security = plist::Dictionary::new();
     let mut domain = plist::Dictionary::new();
     domain.insert("NSExceptionAllowsInsecureHTTPLoads".into(), true.into());
     domain.insert("NSIncludesSubdomains".into(), true.into());
@@ -221,8 +221,11 @@ fn create_info_plist(
     let mut exception_domains = plist::Dictionary::new();
     exception_domains.insert(exception_domain, domain.into());
     security.insert("NSExceptionDomains".into(), exception_domains.into());
-    plist.insert("NSAppTransportSecurity".into(), security.into());
   }
+  if settings.is_ignore_tls_errors() {
+    security.insert("NSAllowsArbitraryLoadsInWebContent".into(), true.into());
+  }
+  plist.insert("NSAppTransportSecurity".into(), security.into());
 
   if let Some(user_plist_path) = &settings.macos().info_plist_path {
     let user_plist = plist::Value::from_file(user_plist_path)?;

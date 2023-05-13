@@ -1272,6 +1272,11 @@ pub struct SecurityConfig {
   /// vulnerable to dangerous Tauri command related attacks otherwise.
   #[serde(default, alias = "dangerous-remote-domain-ipc-access")]
   pub dangerous_remote_domain_ipc_access: Vec<RemoteDomainAccessScope>,
+  /// Whether ignore webview tls errors.
+  ///
+  /// This is a really important part of the configuration since it helps you ensure your WebView is secured.
+  #[serde(default, alias = "dangerous-ignore-tls-errors")]
+  pub dangerous_ignore_tls_errors: bool,
 }
 
 /// Defines an allowlist type.
@@ -3657,6 +3662,7 @@ mod build {
       let dangerous_disable_asset_csp_modification = &self.dangerous_disable_asset_csp_modification;
       let dangerous_remote_domain_ipc_access =
         vec_lit(&self.dangerous_remote_domain_ipc_access, identity);
+      let dangerous_ignore_tls_errors = self.dangerous_ignore_tls_errors;
 
       literal_struct!(
         tokens,
@@ -3665,7 +3671,8 @@ mod build {
         dev_csp,
         freeze_prototype,
         dangerous_disable_asset_csp_modification,
-        dangerous_remote_domain_ipc_access
+        dangerous_remote_domain_ipc_access,
+        dangerous_ignore_tls_errors
       );
     }
   }
@@ -3931,6 +3938,7 @@ mod test {
         freeze_prototype: false,
         dangerous_disable_asset_csp_modification: DisabledCspModificationKind::Flag(false),
         dangerous_remote_domain_ipc_access: Vec::new(),
+        dangerous_ignore_tls_errors: false,
       },
       allowlist: AllowlistConfig::default(),
       system_tray: None,

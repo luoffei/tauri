@@ -53,10 +53,19 @@ pub trait AppSettings {
       .bundle_settings(self.get_bundle_settings(config, &enabled_features)?)
       .binaries(self.get_binaries(config, &target)?)
       .project_out_directory(out_dir)
-      .target(target);
+      .target(target)
+      .ignore_tls_errors(config.tauri.security.dangerous_ignore_tls_errors);
 
     if let Some(types) = package_types {
       settings_builder = settings_builder.package_types(types);
+    }
+
+    if config.tauri.security.dangerous_ignore_tls_errors && !options.debug {
+      log::warn!(
+        "{} {}",
+        "Ignoring tls errors in production mode is an unwise choice.",
+        "For application security, please use valid certificates."
+      );
     }
 
     settings_builder.build().map_err(Into::into)

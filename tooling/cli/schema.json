@@ -163,6 +163,7 @@
         },
         "security": {
           "dangerousDisableAssetCspModification": false,
+          "dangerousIgnoreTlsErrors": false,
           "dangerousRemoteDomainIpcAccess": [],
           "freezePrototype": false
         },
@@ -416,6 +417,7 @@
           "description": "Security configuration.",
           "default": {
             "dangerousDisableAssetCspModification": false,
+            "dangerousIgnoreTlsErrors": false,
             "dangerousRemoteDomainIpcAccess": [],
             "freezePrototype": false
           },
@@ -2630,6 +2632,11 @@
           "items": {
             "$ref": "#/definitions/RemoteDomainAccessScope"
           }
+        },
+        "dangerousIgnoreTlsErrors": {
+          "description": "Whether ignore webview tls errors.\n\nThis is a really important part of the configuration since it helps you ensure your WebView is secured.",
+          "default": false,
+          "type": "boolean"
         }
       },
       "additionalProperties": false

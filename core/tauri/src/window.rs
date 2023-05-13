@@ -311,9 +311,12 @@ impl<'a, R: Runtime> WindowBuilder<'a, R> {
   /// Creates a new webview window.
   pub fn build(mut self) -> crate::Result<Window<R>> {
     let web_resource_request_handler = self.web_resource_request_handler.take();
+    let ignore_tls_errors = self.manager.config().tauri.security.dangerous_ignore_tls_errors;
+    let webview_attributes = self.webview_attributes.clone();
+    let webview_attributes = webview_attributes.ignore_tls_errors(ignore_tls_errors);
     let pending = PendingWindow::new(
       self.window_builder.clone(),
-      self.webview_attributes.clone(),
+      webview_attributes,
       self.label.clone(),
     )?;
     let labels = self.manager.labels().into_iter().collect::<Vec<_>>();
