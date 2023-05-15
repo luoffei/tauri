@@ -95,6 +95,8 @@ impl ClientBuilder {
       client_builder = client_builder.connect_timeout(connect_timeout);
     }
 
+    client_builder = client_builder.danger_accept_invalid_certs(true);
+
     let client = client_builder.build()?;
     Ok(Client(client))
   }
@@ -152,6 +154,8 @@ impl Client {
         request_builder = request_builder.max_redirections(max_redirections as u32);
       }
     }
+
+    request_builder = request_builder.danger_accept_invalid_certs(true);
 
     if let Some(timeout) = request.timeout {
       request_builder = request_builder.timeout(timeout);
