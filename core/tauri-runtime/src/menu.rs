@@ -364,6 +364,8 @@ pub struct CustomMenuItem {
   pub id_str: MenuId,
   pub title: String,
   pub keyboard_accelerator: Option<String>,
+  #[cfg(target_os = "linux")]
+  pub selectable: bool,
   pub enabled: bool,
   pub selected: bool,
   #[cfg(target_os = "macos")]
@@ -380,6 +382,8 @@ impl CustomMenuItem {
       title: title.into(),
       keyboard_accelerator: None,
       enabled: true,
+      #[cfg(target_os = "linux")]
+      selectable: false,
       selected: false,
       #[cfg(target_os = "macos")]
       native_image: None,
@@ -406,6 +410,14 @@ impl CustomMenuItem {
   #[must_use]
   pub fn disabled(mut self) -> Self {
     self.enabled = false;
+    self
+  }
+
+  /// Mark the item as selectable.
+  #[cfg(target_os = "linux")]
+  #[must_use]
+  pub fn selectable(mut self) -> Self {
+    self.selectable = true;
     self
   }
 

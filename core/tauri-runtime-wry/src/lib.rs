@@ -316,6 +316,10 @@ impl<'a> From<&'a CustomMenuItem> for MenuItemAttributesWrapper<'a> {
       .with_enabled(item.enabled)
       .with_selected(item.selected)
       .with_id(WryMenuId(item.id));
+    #[cfg(target_os = "linux")]
+    {
+      attributes = attributes.with_selectable(item.selectable);
+    }
     if let Some(accelerator) = item.keyboard_accelerator.as_ref() {
       attributes = attributes.with_accelerators(&accelerator.parse().expect("invalid accelerator"));
     }
