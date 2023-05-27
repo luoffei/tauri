@@ -1058,6 +1058,8 @@ fn tauri_config_to_bundle_settings(
         Some(depends)
       },
       files: config.deb.files,
+      prerm: config.deb.prerm,
+      postinst: config.deb.postinst,
     },
     macos: MacOsSettings {
       frameworks: config.macos.frameworks,

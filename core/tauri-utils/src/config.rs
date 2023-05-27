@@ -272,6 +272,10 @@ pub struct DebConfig {
   /// The files to include on the package.
   #[serde(default)]
   pub files: HashMap<PathBuf, PathBuf>,
+  /// Pre-uninstallation script.
+  pub prerm: Option<PathBuf>,
+  /// Post-installation script.
+  pub postinst: Option<PathBuf>,
 }
 
 fn de_minimum_system_version<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>

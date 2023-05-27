@@ -1272,6 +1272,20 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "prerm": {
+          "description": "Pre-uninstallation script.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "postinst": {
+          "description": "Post-installation script.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false

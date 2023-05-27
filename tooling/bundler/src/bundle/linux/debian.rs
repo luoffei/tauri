@@ -85,6 +85,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   let control_dir = package_dir.join("control");
   generate_control_file(settings, arch, &control_dir, &data_dir)
     .with_context(|| "Failed to create control file")?;
+  copy_prerm_and_postinst(settings, &control_dir).with_context(|| "Failed to copy prerm or postinst script")?;
   generate_md5sums(&control_dir, &data_dir).with_context(|| "Failed to create md5sums file")?;
 
   // Generate `debian-binary` file; see
@@ -262,6 +263,17 @@ fn copy_custom_files(settings: &Settings, data_dir: &Path) -> crate::Result<()> 
         }
       }
     }
+  }
+  Ok(())
+}
+
+/// Copies prerm and postinst to the deb package.
+fn copy_prerm_and_postinst(settings: &Settings, control_dir: &Path) -> crate::Result<()> {
+  if let Some(ref prerm_path) = settings.deb().prerm {
+    common::copy_file(prerm_path, control_dir.join("prerm"))?;
+  }
+  if let Some(ref postinst_path) = settings.deb().postinst {
+    common::copy_file(postinst_path, control_dir.join("postinst"))?;
   }
   Ok(())
 }
